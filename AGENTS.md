@@ -6,9 +6,9 @@ Lukas Hechenberger's personal Bun workspaces monorepo of helper packages for CI,
 
 Packages ship TypeScript source and run on Bun (no build step) unless a package needs otherwise.
 
-## Keep it generic (open-source ready)
+## Keep it generic (open source)
 
-The repository is private for now but **will be open-sourced**, and published packages are public on npm from the first release (the tarball contains the source). Treat everything as public:
+The repository is **public** (MIT) and the packages are public on npm (the tarball contains the source). Treat everything as public:
 
 - No secrets: tokens, keys, passwords, connection strings, bypass secrets. Use placeholders (`<token>`, `${VAR}`).
 - No project details: names, repositories, paths, domains, URLs, IDs, configuration, customers, prices or unreleased plans of any real project or company. Not in code, tests, fixtures, READMEs, comments, changesets, commit messages or PR descriptions. Use `example.com`, `my-app`, `acme`.

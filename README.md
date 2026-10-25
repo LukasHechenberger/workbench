@@ -28,4 +28,8 @@ Changesets: `bun run changeset` per change, merge to `main`; the CI workflow ope
 
 ## Keep it generic
 
-This repository is meant to be open-sourced later. Packages must be generic: no names, paths, URLs, IDs or configuration of real projects, customers or companies, and no secrets. Project-specific settings (skip lists, rules) live in the consuming project, never here; examples use `example.com`. See `AGENTS.md`; the `public-repo-guard` agent checks this.
+This repository is open source (MIT). Packages must be generic: no names, paths, URLs, IDs or configuration of real projects, customers or companies, and no secrets. Project-specific settings (skip lists, rules) live in the consuming project, never here; examples use `example.com`. See `AGENTS.md`; the `public-repo-guard` agent checks this.
+
+## License
+
+[MIT](LICENSE)
