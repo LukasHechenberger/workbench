@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { type LinkResult, LinkState } from 'linkinator';
-import { classify } from './classify.ts';
+import { classify } from './classify';
 
 const link = (url: string): LinkResult => ({ url, state: LinkState.BROKEN, status: 400 });
 
