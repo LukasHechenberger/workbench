@@ -16,7 +16,7 @@
     ".": "./src/index.ts"
   },
   "bin": {
-    "check-links": "./src/cli.ts"
+    "check-links": "src/cli.ts"
   },
   "files": [
     "src",
