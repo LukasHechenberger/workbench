@@ -9,6 +9,15 @@
     "vercel",
     "ci"
   ],
+  "homepage": "https://github.com/LukasHechenberger/workbench/tree/main/packages/check-links#readme",
+  "bugs": {
+    "url": "https://github.com/LukasHechenberger/workbench/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LukasHechenberger/workbench.git",
+    "directory": "packages/check-links"
+  },
   "license": "MIT",
   "author": "Lukas Hechenberger",
   "type": "module",
