@@ -6,6 +6,10 @@ Personal helper packages for CI, testing and tooling, published under the `@lhec
 | ---------------------------------------------------- | ----------------------------------------------------------------- |
 | [`@lhechenberger/check-links`](packages/check-links) | Broken-link crawler for deployments that separates flaky failures |
 
+## Claude Code skills and agents
+
+[`skills/`](skills) and [`agents/`](agents) hold generic skills and agents that are installed with `bunx skills add LukasHechenberger/workbench -s <name>`; see [`skills/README.md`](skills/README.md).
+
 ## Development
 
 ```bash
