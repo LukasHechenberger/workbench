@@ -24,7 +24,7 @@ Create `packages/<name>` with `package.json` (`@lhechenberger/<name>`, `"publish
 
 ### Releasing
 
-Changesets: `bun run changeset` per change, merge to `main`; the CI workflow opens a version PR and publishes to npm when it is merged. Needs the repository secrets `NPM_TOKEN` (publish rights for the scope) and `CHANGESETS_GITHUB_TOKEN` (a personal access token with contents and pull-requests write access, so the version PR triggers CI).
+Changesets: `bun run changeset` per change, merge to `main`; the CI workflow opens a version PR and publishes to npm when it is merged. Publishing uses npm trusted publishing (no npm token): each package needs a trusted publisher for `LukasHechenberger/workbench`, workflow `ci.yml`, with "Allow npm publish" (configure it on npmjs.com after the first publish). Needs the repository secret `CHANGESETS_GITHUB_TOKEN` (a personal access token with contents and pull-requests write access, so the version PR triggers CI).
 
 ## Keep it generic
 
