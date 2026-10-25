@@ -1,0 +1,26 @@
+{
+  "name": "workbench",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Personal helper packages for CI, testing and tooling",
+  "license": "UNLICENSED",
+  "author": "Lukas Hechenberger",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "changeset": "changeset",
+    "check": "tsc --noEmit && prettier --check .",
+    "format": "prettier --write .",
+    "release": "changeset publish",
+    "test": "bun test",
+    "version": "changeset version && bun install"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.7",
+    "@types/bun": "^1.3.0",
+    "prettier": "^3.8.1",
+    "prettier-plugin-packagejson": "^2.5.22",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,7 @@
+node_modules
+.DS_Store
+.env*
+*.tgz
+# Local deny-list for the public-repo-guard agent
+.claude/private-terms.txt
+.claude/settings.local.json

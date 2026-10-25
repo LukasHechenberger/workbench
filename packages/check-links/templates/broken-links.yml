@@ -1,0 +1,116 @@
+name: Broken Links
+
+on:
+  # Sent by Vercel once a deployment is ready. Runs the workflow file on the default branch.
+  repository_dispatch:
+    types:
+      - 'vercel.deployment.ready'
+  workflow_dispatch:
+    inputs:
+      url:
+        type: string
+        description: The URL of the deployed site to check
+        required: true
+
+permissions:
+  contents: read
+  checks: write
+  statuses: write
+
+jobs:
+  broken-links:
+    # Differs from the check run's name below, so the two don't collide
+    name: Crawl deployment
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      URL: ${{ github.event.client_payload.url || inputs.url }}
+      SHA: ${{ github.event.client_payload.git.sha || github.sha }}
+      ENVIRONMENT: ${{ github.event.client_payload.environment || 'manual' }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+    steps:
+      # Sets the commit status "Broken Links | broken-links (<project> - <environment>)" that the
+      # project's Deployment Checks can require before production deployments get the domain:
+      # pending now, and failed or passed once the job is done. Remove if you don't use them.
+      - name: Report to Vercel
+        uses: vercel/repository-dispatch/actions/status@v1
+
+      # Vercel sends the deployment's own URL, which is protected for production deployments too.
+      # Without the secret, production fails and previews are skipped.
+      - name: Require a bypass secret for deployments
+        id: guard
+        run: |
+          echo "Checking $URL ($ENVIRONMENT) at $SHA"
+          if [ "${{ github.event_name }}" = "repository_dispatch" ] && [ -z "$VERCEL_AUTOMATION_BYPASS_SECRET" ]; then
+            if [ "$ENVIRONMENT" = "production" ]; then
+              echo "::error::Set the VERCEL_AUTOMATION_BYPASS_SECRET secret to check production deployments"
+              exit 1
+            fi
+            echo "::warning::Set the VERCEL_AUTOMATION_BYPASS_SECRET secret to check preview deployments"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out code
+        if: steps.guard.outputs.skip != 'true'
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ env.SHA }}
+
+      - name: Setup Bun
+        if: steps.guard.outputs.skip != 'true'
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        if: steps.guard.outputs.skip != 'true'
+        run: bun install --frozen-lockfile
+
+      # Shows up next to the other checks of the deployed commit, also on its pull request
+      - name: Create check run
+        if: steps.guard.outputs.skip != 'true'
+        id: check_run
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { data } = await github.rest.checks.create({
+              ...context.repo,
+              name: 'Broken Links',
+              head_sha: process.env.SHA,
+              status: 'in_progress',
+              details_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+            });
+            return data.id;
+
+      - name: Check for broken links
+        if: steps.guard.outputs.skip != 'true'
+        # Adjust to where @lhechenberger/check-links is installed (or add a package script)
+        run: |
+          set -o pipefail
+          bunx check-links "$URL" | tee broken-links.txt
+
+      - name: Complete check run
+        if: ${{ !cancelled() && steps.check_run.outputs.result }}
+        uses: actions/github-script@v8
+        env:
+          CHECK_RUN_ID: ${{ steps.check_run.outputs.result }}
+          OUTCOME: ${{ job.status }}
+        with:
+          script: |
+            const fs = require('node:fs');
+            const output = fs.existsSync('broken-links.txt')
+              ? fs.readFileSync('broken-links.txt', 'utf8')
+              : 'The check did not run.';
+            const conclusion = process.env.OUTCOME === 'success' ? 'success' : 'failure';
+            const summary = output.trim().split('\n').at(-1);
+
+            await github.rest.checks.update({
+              ...context.repo,
+              check_run_id: Number(process.env.CHECK_RUN_ID),
+              status: 'completed',
+              conclusion,
+              output: {
+                title: summary,
+                summary: `${process.env.URL} (${process.env.ENVIRONMENT})`,
+                // Check run texts are limited to 65,535 characters
+                text: '```\n' + output.slice(-60_000) + '\n```',
+              },
+            });
