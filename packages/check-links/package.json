@@ -4,25 +4,21 @@
   "description": "Crawls a deployed site for broken links, separating flaky failures from real ones. Built for Vercel preview deployments.",
   "keywords": [
     "broken-links",
+    "ci",
     "link-checker",
     "linkinator",
-    "vercel",
-    "ci"
+    "vercel"
   ],
   "homepage": "https://github.com/LukasHechenberger/workbench/tree/main/packages/check-links#readme",
   "bugs": {
     "url": "https://github.com/LukasHechenberger/workbench/issues"
   },
+  "license": "MIT",
+  "author": "Lukas Hechenberger",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/LukasHechenberger/workbench.git",
     "directory": "packages/check-links"
-  },
-  "license": "MIT",
-  "author": "Lukas Hechenberger",
-  "type": "module",
-  "exports": {
-    ".": "./src/index.ts"
   },
   "bin": {
     "check-links": "src/cli.ts"
@@ -32,6 +28,13 @@
     "!src/**/*.test.ts",
     "templates"
   ],
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "bun test"
   },
@@ -40,8 +43,5 @@
   },
   "engines": {
     "bun": ">=1.2"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

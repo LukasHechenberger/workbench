@@ -38,6 +38,7 @@ export async function classify(
   // A burst of requests is what failed in the first place, so the second pass is gentle
   for (let i = 0; i < toRecheck.length; i += concurrency) {
     const batch = toRecheck.slice(i, i + concurrency);
+    // oxlint-disable-next-line no-await-in-loop -- one batch after the other, on purpose
     const results = await Promise.all(batch.map((link) => recovers(link)));
     for (const [index, link] of batch.entries()) (results[index] ? flaky : errors).push(link);
   }

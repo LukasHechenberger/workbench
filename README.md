@@ -14,7 +14,7 @@ Personal helper packages for CI, testing and tooling, published under the `@lhec
 
 ```bash
 bun install
-bun run check   # tsc + prettier
+bun run check   # tsc (TypeScript 7), oxlint and oxfmt
 bun run test
 ```
 
