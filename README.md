@@ -20,7 +20,7 @@ Create `packages/<name>` with `package.json` (`@lhechenberger/<name>`, `"publish
 
 ### Releasing
 
-Changesets: `bun run changeset` per change, merge to `main`; the release workflow opens a version PR and publishes to npm when it is merged (needs the `NPM_TOKEN` repository secret).
+Changesets: `bun run changeset` per change, merge to `main`; the CI workflow opens a version PR and publishes to npm when it is merged. Needs the repository secrets `NPM_TOKEN` (publish rights for the scope) and `CHANGESETS_GITHUB_TOKEN` (a personal access token with contents and pull-requests write access, so the version PR triggers CI).
 
 ## Keep it generic
 

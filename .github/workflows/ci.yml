@@ -4,13 +4,39 @@ on:
   push:
     branches: [main]
   pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/heads/changeset-release/') }}
 
 jobs:
-  check:
+  build:
+    name: Code Quality
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
       - run: bun install --frozen-lockfile
       - run: bun run check
       - run: bun run test
+
+      # Opens the "Version Packages" PR, and publishes once it is merged. Uses a personal access
+      # token instead of GITHUB_TOKEN: pull requests opened with GITHUB_TOKEN don't trigger CI.
+      - name: Changesets
+        if: ${{ github.event_name == 'push' }}
+        uses: changesets/action@v1
+        with:
+          commit: 'chore: Update versions'
+          title: 'chore: Update versions'
+          commitMode: github-api
+          version: bun run version
+          publish: bun run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.CHANGESETS_GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
