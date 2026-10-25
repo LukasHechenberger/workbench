@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Personal helper packages for CI, testing and tooling",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "author": "Lukas Hechenberger",
   "workspaces": [
     "packages/*"

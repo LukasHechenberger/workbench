@@ -9,7 +9,7 @@
     "vercel",
     "ci"
   ],
-  "license": "UNLICENSED",
+  "license": "MIT",
   "author": "Lukas Hechenberger",
   "type": "module",
   "exports": {

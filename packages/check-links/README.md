@@ -93,3 +93,7 @@ import { classify, run, defineConfig } from '@lhechenberger/check-links';
 ```
 
 `run(url, config)` crawls and prints, and resolves to the exit code; `classify` is the pure part that sorts broken links into `errors`, `flaky` and `warnings`.
+
+## License
+
+[MIT](LICENSE)
