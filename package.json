@@ -12,10 +12,10 @@
     "changeset": "changeset",
     "check": "tsc --noEmit && oxlint --max-warnings 0 && oxfmt --check",
     "format": "oxfmt",
+    "lint": "oxlint --max-warnings 0",
     "release": "changeset publish",
     "test": "bun test",
-    "version": "changeset version && bun install",
-    "lint": "oxlint --max-warnings 0"
+    "version": "changeset version && bun install"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.7",
