@@ -4,6 +4,14 @@ import type { CheckLinksConfig } from './config.ts';
 
 const BYPASS_ENV = 'VERCEL_AUTOMATION_BYPASS_SECRET';
 
+const print = (title: string, results: LinkResult[]) => {
+  if (results.length === 0) return;
+  console.log(`\n${title}`);
+  for (const link of results) {
+    console.log(`  [${link.status ?? 'error'}] ${link.url}\n    on ${link.parent}`);
+  }
+};
+
 /** Crawls `url` and prints the result. Returns the process exit code. */
 export async function run(url: string, config: CheckLinksConfig): Promise<number> {
   const { origin } = new URL(url);
@@ -63,14 +71,6 @@ export async function run(url: string, config: CheckLinksConfig): Promise<number
     wait: () => new Promise((resolve) => setTimeout(resolve, config.retryAfterMs ?? 5000)),
     concurrency: config.recheckConcurrency ?? 5,
   });
-
-  const print = (title: string, results: LinkResult[]) => {
-    if (results.length === 0) return;
-    console.log(`\n${title}`);
-    for (const link of results) {
-      console.log(`  [${link.status ?? 'error'}] ${link.url}\n    on ${link.parent}`);
-    }
-  };
 
   print(`${config.warningTitle ?? 'Broken links that are only warnings'} (warnings):`, warnings);
   print('Links that worked on a second request (warnings):', flaky);

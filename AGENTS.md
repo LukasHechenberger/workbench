@@ -19,7 +19,7 @@ Run the `public-repo-guard` agent before every commit that is pushed. It also re
 
 ## Checks
 
-`bun run check` (tsc and Prettier) and `bun run test`. `bun run format` fixes Prettier issues.
+`bun run check` (tsc, oxlint with type-aware rules, and oxfmt) and `bun run test`. `bun run format` fixes formatting; `bun run lint` runs oxlint alone. The toolchain is TypeScript 7 (native), oxlint (`.oxlintrc.json`) and oxfmt (`.oxfmtrc.json`); warnings fail the check.
 
 ## Changesets
 

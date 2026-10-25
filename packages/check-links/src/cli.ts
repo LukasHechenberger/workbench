@@ -37,7 +37,8 @@ if (positionals[0] === 'init-workflow') {
 const configPath = resolve(values.config ?? 'check-links.config.ts');
 let config: CheckLinksConfig = {};
 if (existsSync(configPath)) {
-  config = ((await import(configPath)) as { default: CheckLinksConfig }).default;
+  const loaded: { default: CheckLinksConfig } = await import(configPath);
+  config = loaded.default;
 } else if (values.config) {
   console.error(`Config ${configPath} not found`);
   process.exit(1);
