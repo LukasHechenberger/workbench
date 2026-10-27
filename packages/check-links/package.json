@@ -40,7 +40,8 @@
   "scripts": {
     "build": "bun run ../../scripts/build.ts",
     "prepack": "bun run build",
-    "test": "bun test"
+    "test": "bun test src",
+    "test:integration": "bun test integration"
   },
   "dependencies": {
     "linkinator": "^8.1.0"

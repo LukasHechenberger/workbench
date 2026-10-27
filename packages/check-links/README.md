@@ -101,7 +101,12 @@ Without the secret, production deployments fail the job (they would be held back
 
 ## Local development of the checks
 
-`bun test` runs the unit tests of the classification (flaky vs. real errors).
+`bun run test` (Turborepo, from the repository root) builds the package and runs
+
+- the unit tests of the classification (flaky vs. real errors) (`test`), in parallel to the build, and
+- once built, an integration test (`test:integration`, `integration/node.test.ts`) that runs the compiled CLI **with Node.js** against a local server: the usage output, the exit code for a broken link, a TypeScript `check-links.config.ts` loaded through Node's native type stripping, and a `check-links.config.mjs` found in the working directory. It needs `node` on the `PATH` (22.18 or newer, or any Node.js with `--experimental-strip-types`) and makes no network requests.
+
+To check by hand which Node.js versions work, run `bun run build` and then `node dist/cli.js <url>` with that version (e.g. `npx node@22.18 dist/cli.js <url>`).
 
 ## Programmatic API
 

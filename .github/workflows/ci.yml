@@ -27,9 +27,9 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
       - run: bun install --frozen-lockfile
-      - run: bun run build
-      - run: bun run check
-      - run: bun run test
+      # Turborepo runs the type check, lint and format check in parallel to the build and the unit
+      # tests; the integration tests start once the build is done
+      - run: bun run ci
 
       # Opens the "Version Packages" PR, and publishes once it is merged. Uses a personal access
       # token instead of GITHUB_TOKEN: pull requests opened with GITHUB_TOKEN don't trigger CI.

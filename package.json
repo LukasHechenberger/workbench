@@ -9,13 +9,16 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "bun run --filter '*' build",
+    "build": "turbo run build",
     "changeset": "changeset",
-    "check": "tsc --noEmit && oxlint --max-warnings 0 && oxfmt --check",
+    "check": "turbo run //#typecheck //#lint //#format:check",
+    "ci": "turbo run test test:integration //#typecheck //#lint //#format:check",
     "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "lint": "oxlint --max-warnings 0",
     "release": "changeset publish",
-    "test": "bun test",
+    "test": "turbo run test test:integration",
+    "typecheck": "tsc --noEmit",
     "version": "changeset version && bun install"
   },
   "devDependencies": {
@@ -25,6 +28,13 @@
     "oxfmt": "^0.74.0",
     "oxlint": "^1.89.0",
     "oxlint-tsgolint": "^7.0.2005",
+    "turbo": "^2.11.10",
     "typescript": "^7.0.2"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "bun",
+      "version": "1.4.3"
+    }
   }
 }
