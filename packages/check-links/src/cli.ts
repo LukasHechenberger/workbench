@@ -6,9 +6,16 @@ import type { CheckLinksConfig } from './config';
 import { run } from './run';
 
 const usage = `Usage:
-  check-links [url] [--config <file>]   Config: check-links.config.{ts,mts,js,mjs} by default
-  check-links init-workflow [path]   Writes the GitHub workflow template (default .github/workflows/broken-links.yml)
-  check-links --version`;
+  check-links [url] [options]           Crawls the site and reports broken links
+  check-links init-workflow [path]      Writes the GitHub workflow template (default .github/workflows/broken-links.yml)
+
+Options:
+  --config <file>   Config file (default: check-links.config.{ts,mts,js,mjs} in the working directory)
+  -v, --version     Print the version
+  -h, --help        Print this help
+
+Environment:
+  VERCEL_AUTOMATION_BYPASS_SECRET   Deployment protection bypass secret, sent to the checked origin`;
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
