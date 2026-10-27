@@ -2,8 +2,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
-import type { CheckLinksConfig } from './config.ts';
-import { run } from './run.ts';
+import type { CheckLinksConfig } from './config';
+import { run } from './run';
 
 const usage = `Usage:
   check-links [url] [--config check-links.config.ts]

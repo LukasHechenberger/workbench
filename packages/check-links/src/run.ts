@@ -1,6 +1,6 @@
 import { check, type LinkResult, LinkState } from 'linkinator';
-import { classify } from './classify.ts';
-import type { CheckLinksConfig } from './config.ts';
+import { classify } from './classify';
+import type { CheckLinksConfig } from './config';
 
 const BYPASS_ENV = 'VERCEL_AUTOMATION_BYPASS_SECRET';
 

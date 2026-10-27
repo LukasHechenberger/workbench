@@ -1,3 +1,3 @@
-export { classify, type Classification, type ClassifyOptions } from './classify.ts';
-export { defineConfig, type CheckLinksConfig, type LinkContext } from './config.ts';
-export { run } from './run.ts';
+export { classify, type Classification, type ClassifyOptions } from './classify';
+export { defineConfig, type CheckLinksConfig, type LinkContext } from './config';
+export { run } from './run';

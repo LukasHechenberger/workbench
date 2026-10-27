@@ -1,7 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "isolatedModules": true,
     "lib": ["es2023"],

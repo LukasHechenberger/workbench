@@ -64,6 +64,11 @@ export default defineConfig({
 | `concurrency`        | `20`    | Parallel requests of the crawl                       |
 | `timeout`            | `30000` | Timeout per request in ms                            |
 
+### Type-checking and unused-file tools
+
+- The package ships TypeScript source (no build step). Relative imports inside it have no `.ts` extension, so a project that type-checks its `check-links.config.ts` (e.g. listed in `tsconfig.json` `include`) needs `moduleResolution: "bundler"` (or `"node16"`/`"nodenext"` is **not** supported) and Node or Bun types (`@types/node` or `@types/bun`), since the code uses `process`. Before 0.2.2 the imports ended in `.ts`; if you see `TS5097` from `node_modules/@lhechenberger/check-links`, update the package.
+- [knip](https://knip.dev) reports the config as an unused file. Declare it as an entry in `knip.json`: `{ "workspaces": { "apps/web": { "entry": ["check-links.config.ts"] } } }` (use `"entry"` at the top level in a single-package repo).
+
 ## GitHub workflow: check every Vercel deployment
 
 The package contains a workflow template that runs the check when Vercel reports a ready deployment, shows the result as a **"Broken Links" check run** on the deployed commit (so it appears on the pull request, with the full output) and reports the commit status that Vercel's Deployment Checks can require before a production deployment gets its domain.
