@@ -5,3 +5,4 @@ node_modules
 # Local deny-list for the public-repo-guard agent
 .claude/private-terms.txt
 .claude/settings.local.json
+dist

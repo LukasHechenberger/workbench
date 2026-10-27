@@ -11,12 +11,14 @@ Fresh deployments answer some first requests with errors: image optimization (`/
 
 It also handles Vercel's deployment protection (bypass header, and a check that the start URL isn't the login page) and can downgrade known-unfixable links (e.g. third-party content) to warnings.
 
-Requires [Bun](https://bun.sh) (the package ships TypeScript source and runs with a Bun shebang).
+Works with Node.js (22.18 or newer) and [Bun](https://bun.sh). The package ships a compiled build (`dist`) with type declarations. A config file is loaded natively by both runtimes, as TypeScript (`.ts`; Node strips the types itself from 22.18 on) or plain JavaScript (`.mjs`).
 
 ## Install
 
 ```bash
 bun add -d @lhechenberger/check-links
+# or
+npm install --save-dev @lhechenberger/check-links
 ```
 
 ## Usage
@@ -27,13 +29,15 @@ bunx check-links                      # uses `url` from the config, e.g. the loc
 bunx check-links <url> --config ci/check-links.config.ts
 ```
 
+With npm use `npx check-links …` instead of `bunx check-links …`.
+
 Set `VERCEL_AUTOMATION_BYPASS_SECRET` (Vercel project → Deployment Protection → Protection Bypass for Automation) to check protected deployments. The secret is sent as `x-vercel-protection-bypass` header, also to the second requests (same-origin only, never to third parties).
 
 The last line of the output is a one-line summary (`Checked N links on <origin>: X broken, Y warnings`); the exit code is `1` if `X > 0`.
 
 ## Configuration
 
-Optional `check-links.config.ts` in the working directory:
+Optional config file in the working directory. Without `--config`, the first of `check-links.config.ts`, `.mts`, `.js` and `.mjs` that exists is used (`--config <file>` takes any path). The default export is the configuration:
 
 ```ts
 import { defineConfig } from '@lhechenberger/check-links';
@@ -64,9 +68,17 @@ export default defineConfig({
 | `concurrency`        | `20`    | Parallel requests of the crawl                       |
 | `timeout`            | `30000` | Timeout per request in ms                            |
 
+In a JavaScript config (`check-links.config.mjs`, or `.js` in a package with `"type": "module"`) use the same code without type annotations; `defineConfig` still gives editors the types:
+
+```js
+import { defineConfig } from '@lhechenberger/check-links';
+
+export default defineConfig({ url: 'http://localhost:3000', retryAfterMs: 1000 });
+```
+
 ### Type-checking and unused-file tools
 
-- The package ships TypeScript source (no build step). Relative imports inside it have no `.ts` extension, so a project that type-checks its `check-links.config.ts` (e.g. listed in `tsconfig.json` `include`) needs `moduleResolution: "bundler"` (or `"node16"`/`"nodenext"` is **not** supported) and Node or Bun types (`@types/node` or `@types/bun`), since the code uses `process`. Before 0.2.2 the imports ended in `.ts`; if you see `TS5097` from `node_modules/@lhechenberger/check-links`, update the package.
+- The package ships compiled JavaScript with type declarations, so a project that type-checks its `check-links.config.ts` (e.g. listed in `tsconfig.json` `include`) needs no special `moduleResolution`. The declarations reference Node types (`@types/node` or `@types/bun`) since the code uses `process`.
 - [knip](https://knip.dev) reports the config as an unused file. Declare it as an entry in `knip.json`: `{ "workspaces": { "apps/web": { "entry": ["check-links.config.ts"] } } }` (use `"entry"` at the top level in a single-package repo).
 
 ## GitHub workflow: check every Vercel deployment

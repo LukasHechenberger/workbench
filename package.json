@@ -9,6 +9,7 @@
     "packages/*"
   ],
   "scripts": {
+    "build": "bun run --filter '*' build",
     "changeset": "changeset",
     "check": "tsc --noEmit && oxlint --max-warnings 0 && oxfmt --check",
     "format": "oxfmt",
