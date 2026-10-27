@@ -7,15 +7,28 @@ import { run } from './run';
 
 const usage = `Usage:
   check-links [url] [--config <file>]   Config: check-links.config.{ts,mts,js,mjs} by default
-  check-links init-workflow [path]   Writes the GitHub workflow template (default .github/workflows/broken-links.yml)`;
+  check-links init-workflow [path]   Writes the GitHub workflow template (default .github/workflows/broken-links.yml)
+  check-links --version`;
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
-  options: { config: { type: 'string' }, help: { type: 'boolean', short: 'h' } },
+  options: {
+    config: { type: 'string' },
+    help: { type: 'boolean', short: 'h' },
+    version: { type: 'boolean', short: 'v' },
+  },
 });
 
 if (values.help) {
   console.log(usage);
+  process.exit(0);
+}
+
+if (values.version) {
+  const pkg: { version: string } = JSON.parse(
+    readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+  );
+  console.log(pkg.version);
   process.exit(0);
 }
 
