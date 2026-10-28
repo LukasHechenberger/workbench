@@ -27,6 +27,8 @@ npm install --save-dev @lhechenberger/check-links
 bunx check-links https://my-preview.example.vercel.app
 bunx check-links                      # uses `url` from the config, e.g. the local dev server
 bunx check-links <url> --config ci/check-links.config.ts
+bunx check-links --version            # prints the installed version
+bunx check-links --help               # lists the commands and options
 ```
 
 With npm use `npx check-links …` instead of `bunx check-links …`.
