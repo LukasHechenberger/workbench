@@ -17,9 +17,9 @@
     },
     "packages/check-links": {
       "name": "@lhechenberger/check-links",
-      "version": "0.2.2",
+      "version": "0.3.0",
       "bin": {
-        "check-links": "src/cli.ts",
+        "check-links": "dist/cli.js",
       },
       "dependencies": {
         "linkinator": "^8.1.0",

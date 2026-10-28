@@ -1,5 +1,15 @@
 # @lhechenberger/check-links
 
+## 0.3.0
+
+### Minor Changes
+
+- [#11](https://github.com/LukasHechenberger/workbench/pull/11) [`8e4cfa4`](https://github.com/LukasHechenberger/workbench/commit/8e4cfa4664bdc0974a8ee1927777b3d22bcc4963) - Ship a compiled build (ESM plus type declarations) instead of TypeScript source, so the package runs on Node.js 22.18+ as well as Bun.
+
+  The CLI now also finds a `check-links.config.mts`, `.js` or `.mjs` in the working directory, not just `.ts`.
+
+- [#12](https://github.com/LukasHechenberger/workbench/pull/12) [`dfd8374`](https://github.com/LukasHechenberger/workbench/commit/dfd837469c239cb849a4811b0be729e674e83c15) - Add a `--version` (`-v`) option to the CLI, and list all options in the `--help` output.
+
 ## 0.2.2
 
 ### Patch Changes
