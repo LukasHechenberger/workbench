@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "skills": {
+    "pre-pr": {
+      "source": "./skills/pre-pr",
+      "sourceType": "local",
+      "computedHash": "85120cc3697f2e03f034a59ed1631ce28add291984059f08a206c6757741bc2d"
+    },
+    "turborepo": {
+      "source": "vercel/turborepo",
+      "sourceType": "github",
+      "skillPath": "skills/turborepo/SKILL.md",
+      "computedHash": "9681d8dfeb5e6cdff767f1bcaba5d7ac55732a9d6c02ee120f44229f8ec25e7e"
+    }
+  }
+}
