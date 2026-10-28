@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
@@ -6,7 +6,7 @@ import type { CheckLinksConfig } from './config';
 import { run } from './run';
 
 const usage = `Usage:
-  check-links [url] [--config check-links.config.ts]
+  check-links [url] [--config <file>]   Config: check-links.config.{ts,mts,js,mjs} by default
   check-links init-workflow [path]   Writes the GitHub workflow template (default .github/workflows/broken-links.yml)`;
 
 const { positionals, values } = parseArgs({
@@ -34,12 +34,15 @@ if (positionals[0] === 'init-workflow') {
   process.exit(0);
 }
 
-const configPath = resolve(values.config ?? 'check-links.config.ts');
+const configExtensions = ['ts', 'mts', 'js', 'mjs'];
+const configPath = values.config
+  ? resolve(values.config)
+  : configExtensions.map((ext) => resolve(`check-links.config.${ext}`)).find((p) => existsSync(p));
 let config: CheckLinksConfig = {};
-if (existsSync(configPath)) {
+if (configPath && existsSync(configPath)) {
   const loaded: { default: CheckLinksConfig } = await import(configPath);
   config = loaded.default;
-} else if (values.config) {
+} else if (configPath) {
   console.error(`Config ${configPath} not found`);
   process.exit(1);
 }

@@ -21,27 +21,33 @@
     "directory": "packages/check-links"
   },
   "bin": {
-    "check-links": "src/cli.ts"
+    "check-links": "dist/cli.js"
   },
   "files": [
-    "src",
-    "!src/**/*.test.ts",
+    "dist",
     "templates"
   ],
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "test": "bun test"
+    "build": "bun run ../../scripts/build.ts",
+    "prepack": "bun run build",
+    "test": "bun test src",
+    "test:integration": "bun test integration"
   },
   "dependencies": {
     "linkinator": "^8.1.0"
   },
   "engines": {
-    "bun": ">=1.2"
+    "bun": ">=1.2",
+    "node": ">=22.18"
   }
 }
