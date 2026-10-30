@@ -33,7 +33,8 @@ export async function run(url: string, config: CheckLinksConfig): Promise<number
     ? { 'x-vercel-protection-bypass': bypassSecret }
     : {};
   const headersFor = (requestUrl: string) => (originOf(requestUrl) === origin ? headers : {});
-  const request = createRequest(headersFor);
+  const timeout = config.timeout ?? 30_000;
+  const request = createRequest(headersFor, timeout);
 
   // A protected deployment redirects to Vercel's login page, which linkinator would happily
   // check instead of the site
@@ -55,7 +56,7 @@ export async function run(url: string, config: CheckLinksConfig): Promise<number
     path: url,
     recurse: true,
     concurrency,
-    timeout: config.timeout ?? 30_000,
+    timeout,
     // Retries 5xx responses and network errors, which are mostly temporary
     retryErrors: true,
     retryErrorsCount: 2,

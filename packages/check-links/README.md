@@ -33,7 +33,9 @@ bunx check-links --help               # lists the commands and options
 
 With npm use `npx check-links …` instead of `bunx check-links …`.
 
-Set `VERCEL_AUTOMATION_BYPASS_SECRET` (Vercel project → Deployment Protection → Protection Bypass for Automation) to check protected deployments. The secret is sent as `x-vercel-protection-bypass` header with every request to the checked origin, and never to other sites: the crawler only requests the checked origin, links to other sites are requested after the crawl without the header, and redirects are followed one hop at a time so a page that redirects elsewhere doesn't carry it along.
+Set `VERCEL_AUTOMATION_BYPASS_SECRET` (Vercel project → Deployment Protection → Protection Bypass for Automation) to check protected deployments. The secret is sent as `x-vercel-protection-bypass` header with every request to the checked origin, and never to other sites: the crawler only requests the checked origin, links to other sites are requested after the crawl without the header, and requests that carry the header follow redirects one hop at a time so a page that redirects elsewhere doesn't carry it along.
+
+Set `CHECK_LINKS_DEBUG=1` to log the requests the package makes itself (links to other sites, links to a production origin, second requests), one line per hop with status and redirect target, on stderr.
 
 The last line of the output is a one-line summary (`Checked N links on <origin>: X broken, Y warnings`); the exit code is `1` if `X > 0`.
 

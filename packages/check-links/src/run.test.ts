@@ -32,8 +32,10 @@ const pages = (self: string, other: string): Record<string, string> => ({
   ),
   // A broken absolute link to the deployment itself
   '/self-broken': page(`<link rel="canonical" href="${self}/missing">`),
-  // Links to another site, directly and through a redirect
-  '/external': page(`<a href="${other}/ok">other site</a> <a href="/redirect">redirect</a>`),
+  // Links to another site: directly, through a redirect there, and through a redirect from here
+  '/external': page(
+    `<a href="${other}/ok">other site</a> <a href="${other}/moved">moved</a> <a href="/redirect">redirect</a>`,
+  ),
   '/': page('<a href="/new">new</a>'),
 });
 
@@ -54,6 +56,7 @@ beforeAll(() => {
         path: pathname,
         bypass: request.headers.get('x-vercel-protection-bypass'),
       });
+      if (pathname === '/moved') return Response.redirect(`${otherServer.url.origin}/ok`, 301);
       return pathname === '/ok' ? new Response('fine') : new Response('not found', { status: 404 });
     },
   });
@@ -154,7 +157,12 @@ describe('run with productionOrigin', () => {
       delete process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
     }
 
-    expect(otherRequests.map(({ path }) => path)).toEqual(['/ok', '/ok']);
+    expect(otherRequests.map(({ path }) => path).toSorted()).toEqual([
+      '/moved',
+      '/ok',
+      '/ok',
+      '/ok',
+    ]);
     expect(otherRequests.every(({ bypass }) => bypass === null)).toBe(true);
     expect(requests.find(({ path }) => path === '/redirect')?.bypass).toBe('test-bypass');
   });

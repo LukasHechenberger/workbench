@@ -9,22 +9,36 @@ import { join } from 'node:path';
 const packageDir = join(import.meta.dir, '..');
 const cli = join(packageDir, 'dist/cli.js');
 
-const pages: Record<string, string> = {
-  '/': '<a href="/ok">ok</a> <a href="/missing">missing</a> <a href="/skipped">skipped</a>',
+/** The checked site's pages; `other` is the origin of another site */
+const pages = (other: string): Record<string, string> => ({
+  '/': `<a href="/ok">ok</a> <a href="/missing">missing</a> <a href="/skipped">skipped</a>
+    <a href="/moved">moved</a> <a href="${other}/moved">moved elsewhere</a> <a href="${other}/ok">elsewhere</a>`,
   '/ok': '<p>fine</p>',
-};
+});
 
 let server: ReturnType<typeof Bun.serve>;
+/** Another site, standing in for third-party links; redirects on both sites must be followed */
+let otherServer: ReturnType<typeof Bun.serve>;
 let workDir: string;
 
 beforeAll(async () => {
   // `turbo run test:integration` builds first; running `bun test integration` alone needs `bun run build`
   if (!existsSync(cli)) throw new Error(`${cli} not found, run \`bun run build\` first`);
 
+  otherServer = Bun.serve({
+    port: 0,
+    fetch: (request) => {
+      const { pathname } = new URL(request.url);
+      if (pathname === '/moved') return Response.redirect(`${otherServer.url.origin}/ok`, 301);
+      return pathname === '/ok' ? new Response('fine') : new Response('not found', { status: 404 });
+    },
+  });
   server = Bun.serve({
     port: 0,
     fetch: (request) => {
-      const page = pages[new URL(request.url).pathname];
+      const { pathname } = new URL(request.url);
+      if (pathname === '/moved') return Response.redirect('/ok', 302);
+      const page = pages(otherServer.url.origin)[pathname];
       return page
         ? new Response(page, { headers: { 'content-type': 'text/html' } })
         : new Response('not found', { status: 404 });
@@ -35,6 +49,7 @@ beforeAll(async () => {
 
 afterAll(() => {
   void server.stop(true);
+  void otherServer.stop(true);
   rmSync(workDir, { recursive: true, force: true });
 });
 

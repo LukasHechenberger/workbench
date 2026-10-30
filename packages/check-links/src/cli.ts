@@ -15,7 +15,9 @@ Options:
   -h, --help        Print this help
 
 Environment:
-  VERCEL_AUTOMATION_BYPASS_SECRET   Deployment protection bypass secret, sent to the checked origin`;
+  VERCEL_AUTOMATION_BYPASS_SECRET   Deployment protection bypass secret, sent to the checked origin
+  CHECK_LINKS_DEBUG                 Log the requests the package makes itself (links to other sites,
+                                    second requests), hop by hop`;
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
