@@ -1,6 +1,6 @@
 {
   "name": "@lhechenberger/check-links",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Crawls a deployed site for broken links, separating flaky failures from real ones. Built for Vercel preview deployments.",
   "keywords": [
     "broken-links",
