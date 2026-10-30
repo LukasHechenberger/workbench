@@ -1,5 +1,17 @@
 # @lhechenberger/check-links
 
+## 0.4.0
+
+### Minor Changes
+
+- [#19](https://github.com/LukasHechenberger/workbench/pull/19) [`14dd10e`](https://github.com/LukasHechenberger/workbench/commit/14dd10e35c09138f0c642be2ed0afc78f976f01e) - Add the `productionOrigin` option: links to the live site's origin (canonical and hreflang URLs, `og:url`, …) are requested on the origin being checked instead, so a deployment that adds a route doesn't fail because the route doesn't exist on the live site yet. Accepts one origin or an array, and does nothing when the checked origin is one of them. Broken links are still reported as written on the page, with the requested URL (`… (checked as …)`), and `isWarningOnly` gets that URL as `requestUrl` in its context.
+
+### Patch Changes
+
+- [#20](https://github.com/LukasHechenberger/workbench/pull/20) [`77a476a`](https://github.com/LukasHechenberger/workbench/commit/77a476adb2e379e3ea53a9f116dfc2d4c62d7794) - Never send the deployment protection bypass secret (`x-vercel-protection-bypass`) to other sites. The crawler sent it with every request, third parties included; now it only requests the checked origin, links to other sites are requested after the crawl without the header, and redirects are followed one hop at a time so a page that redirects elsewhere doesn't carry it along.
+
+- [#17](https://github.com/LukasHechenberger/workbench/pull/17) [`1423520`](https://github.com/LukasHechenberger/workbench/commit/1423520718efdd018760ba2683913fe0c1982f33) - The `init-workflow` template now reports the result as a commit status ("Broken Links") on the deployed commit instead of a check run, and writes the full output to the run's job summary. A check run created through the API joins an existing GitHub Actions check suite on the commit, and when that suite is superseded (e.g. a run cancelled by a concurrency rule after GitHub delivered the `pull_request` event twice), the merge box never sees it and a required check stays "expected", blocking auto-merge. A status is attached to the commit itself, so it works as a required status check in branch rulesets; the workflow needs `statuses: write` instead of `checks: write`.
+
 ## 0.3.0
 
 ### Minor Changes
