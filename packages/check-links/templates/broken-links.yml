@@ -14,12 +14,12 @@ on:
 
 permissions:
   contents: read
-  checks: write
   statuses: write
 
 jobs:
   broken-links:
-    # Differs from the check run's name below, so the two don't collide
+    # Not "Broken Links": that's the commit status' context below, and a check run with the same
+    # name would have to pass as well for the required status check to be satisfied.
     name: Crawl deployment
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -27,6 +27,7 @@ jobs:
       URL: ${{ github.event.client_payload.url || inputs.url }}
       SHA: ${{ github.event.client_payload.git.sha || github.sha }}
       ENVIRONMENT: ${{ github.event.client_payload.environment || 'manual' }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
     steps:
       # Sets the commit status "Broken Links | broken-links (<project> - <environment>)" that the
@@ -34,6 +35,27 @@ jobs:
       # pending now, and failed or passed once the job is done. Remove if you don't use them.
       - name: Report to Vercel
         uses: vercel/repository-dispatch/actions/status@v1
+
+      # The result is a commit status on the deployed commit, not a check run: a check run created
+      # through the API joins an existing GitHub Actions check suite on the commit, and if that suite
+      # was superseded (e.g. a CI run cancelled by a concurrency rule after GitHub delivered the
+      # pull_request event twice), the merge box never sees it and a required check stays
+      # "expected". A status is attached to the commit itself, so it works as a required status
+      # check in branch rulesets. Checks from workflow_dispatch runs never count for a pull request,
+      # so manual runs report nothing.
+      - name: Report a pending status
+        if: github.event_name == 'repository_dispatch'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              ...context.repo,
+              sha: process.env.SHA,
+              state: 'pending',
+              context: 'Broken Links',
+              description: 'Checking the deployment for broken links',
+              target_url: process.env.RUN_URL,
+            });
 
       # Vercel sends the deployment's own URL, which is protected for production deployments too.
       # Without the secret, production fails and previews are skipped.
@@ -64,53 +86,52 @@ jobs:
         if: steps.guard.outputs.skip != 'true'
         run: bun install --frozen-lockfile
 
-      # Shows up next to the other checks of the deployed commit, also on its pull request
-      - name: Create check run
-        if: steps.guard.outputs.skip != 'true'
-        id: check_run
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const { data } = await github.rest.checks.create({
-              ...context.repo,
-              name: 'Broken Links',
-              head_sha: process.env.SHA,
-              status: 'in_progress',
-              details_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
-            });
-            return data.id;
-
       - name: Check for broken links
         if: steps.guard.outputs.skip != 'true'
+        id: check
         # Adjust to where @lhechenberger/check-links is installed (or add a package script)
         run: |
           set -o pipefail
           bunx check-links "$URL" | tee broken-links.txt
 
-      - name: Complete check run
-        if: ${{ !cancelled() && steps.check_run.outputs.result }}
+      # The status only has a one-line description; the full output is one click away (the run)
+      - name: Add the output to the job summary
+        if: ${{ !cancelled() && steps.guard.outputs.skip != 'true' }}
+        run: |
+          {
+            echo "### Broken links: $URL ($ENVIRONMENT)"
+            echo
+            echo '```'
+            tail -c 60000 broken-links.txt 2>/dev/null || echo 'The check did not run.'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # A skipped preview reports success, so a required status check doesn't hold the pull
+      # request back; the warning above says what to configure.
+      - name: Report the result
+        if: ${{ !cancelled() && github.event_name == 'repository_dispatch' }}
         uses: actions/github-script@v8
         env:
-          CHECK_RUN_ID: ${{ steps.check_run.outputs.result }}
-          OUTCOME: ${{ job.status }}
+          OUTCOME: ${{ steps.check.outcome }}
+          SKIPPED: ${{ steps.guard.outputs.skip }}
         with:
           script: |
             const fs = require('node:fs');
             const output = fs.existsSync('broken-links.txt')
               ? fs.readFileSync('broken-links.txt', 'utf8')
-              : 'The check did not run.';
-            const conclusion = process.env.OUTCOME === 'success' ? 'success' : 'failure';
-            const summary = output.trim().split('\n').at(-1);
+              : '';
+            // check-links ends with a one-line summary ("Checked N links on <origin>: X broken, Y warnings")
+            const summary = output.trim().split('\n').at(-1) || 'The check did not run';
+            const skipped = process.env.SKIPPED === 'true';
 
-            await github.rest.checks.update({
+            await github.rest.repos.createCommitStatus({
               ...context.repo,
-              check_run_id: Number(process.env.CHECK_RUN_ID),
-              status: 'completed',
-              conclusion,
-              output: {
-                title: summary,
-                summary: `${process.env.URL} (${process.env.ENVIRONMENT})`,
-                // Check run texts are limited to 65,535 characters
-                text: '```\n' + output.slice(-60_000) + '\n```',
-              },
+              sha: process.env.SHA,
+              state: skipped || process.env.OUTCOME === 'success' ? 'success' : 'failure',
+              context: 'Broken Links',
+              // Status descriptions are limited to 140 characters
+              description: skipped
+                ? 'Skipped: set VERCEL_AUTOMATION_BYPASS_SECRET to check preview deployments'
+                : summary.slice(0, 140),
+              target_url: process.env.RUN_URL,
             });
