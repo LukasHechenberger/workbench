@@ -1,5 +1,11 @@
 # @lhechenberger/check-links
 
+## 0.4.1
+
+### Patch Changes
+
+- [#21](https://github.com/LukasHechenberger/workbench/pull/21) [`ec51388`](https://github.com/LukasHechenberger/workbench/commit/ec51388eeaf3fe65d48cb3fe71f9f25d4dbe3069) - Let the runtime follow redirects for requests that carry no bypass header (links to other sites), and apply `timeout` to the requests the package makes itself. Requests to the checked origin keep following redirects one hop at a time, so the bypass secret never travels to another origin. Set `CHECK_LINKS_DEBUG=1` to log those requests hop by hop.
+
 ## 0.4.0
 
 ### Minor Changes
