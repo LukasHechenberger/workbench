@@ -33,7 +33,7 @@ bunx check-links --help               # lists the commands and options
 
 With npm use `npx check-links …` instead of `bunx check-links …`.
 
-Set `VERCEL_AUTOMATION_BYPASS_SECRET` (Vercel project → Deployment Protection → Protection Bypass for Automation) to check protected deployments. The secret is sent as `x-vercel-protection-bypass` header, also to the second requests (same-origin only, never to third parties).
+Set `VERCEL_AUTOMATION_BYPASS_SECRET` (Vercel project → Deployment Protection → Protection Bypass for Automation) to check protected deployments. The secret is sent as `x-vercel-protection-bypass` header with every request to the checked origin, and never to other sites: the crawler only requests the checked origin, links to other sites are requested after the crawl without the header, and redirects are followed one hop at a time so a page that redirects elsewhere doesn't carry it along.
 
 The last line of the output is a one-line summary (`Checked N links on <origin>: X broken, Y warnings`); the exit code is `1` if `X > 0`.
 
@@ -80,7 +80,7 @@ Pages usually carry absolute links to the live site: `<link rel="canonical">`, `
 - A link is rewritten only if its origin is exactly a configured origin (`https://www.example.com/x` for `https://www.example.com`, not `https://example.com/x` or `https://www.example.com.evil.test/x`). Only the origin of the configured value is used; several origins are accepted as an array (e.g. one per locale).
 - The option does nothing when the origin being checked is one of the configured origins, so the same config works for checking the live site.
 - The rewritten requests get the `x-vercel-protection-bypass` header like all other requests to the checked origin.
-- The links are requested, not crawled: a page that is linked only by its live URL isn't followed.
+- The links are requested after the crawl like links to other sites, not crawled: a page that is linked only by its live URL isn't followed.
 - Broken links are reported as written on the page, with the URL that was requested: `[404] https://www.example.com/x (checked as https://my-app-abc123.vercel.app/x)`.
 - `skip` patterns and `isWarningOnly` see the link as written on the page; `isWarningOnly` gets the requested URL as `requestUrl` in its context (for a link that isn't rewritten it's the link itself).
 
