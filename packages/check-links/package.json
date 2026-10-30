@@ -44,7 +44,8 @@
     "test:integration": "bun test integration"
   },
   "dependencies": {
-    "linkinator": "^8.1.0"
+    "linkinator": "^8.1.0",
+    "undici": "^8.0.0"
   },
   "engines": {
     "bun": ">=1.2",
