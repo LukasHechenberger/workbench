@@ -5,11 +5,23 @@ export interface LinkContext {
   origin: string;
   /** The URL the crawl started at */
   url: string;
+  /**
+   * The URL that was requested for the link: the link itself, or its path on the checked origin
+   * for a link to a production origin (see `productionOrigin`)
+   */
+  requestUrl: string;
 }
 
 export interface CheckLinksConfig {
   /** URL to check when none is passed on the command line (e.g. the local dev server) */
   url?: string;
+  /**
+   * Origin(s) of the live site, e.g. `https://www.example.com`. Links to them (canonical and
+   * hreflang URLs, `og:url`, …) are requested on the checked origin instead, since a deployment
+   * that isn't live yet can't be reached through them. Has no effect when the checked origin is
+   * one of them.
+   */
+  productionOrigin?: string | string[];
   /** Links not to check. Strings are matched as regular expression sources. */
   skip?: (string | RegExp)[];
   /**
