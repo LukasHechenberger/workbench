@@ -1,7 +1,9 @@
 import { check, type LinkResult, LinkState } from 'linkinator';
 import { classify } from './classify';
 import type { CheckLinksConfig } from './config';
-import { checkRewrittenLinks, createRewrite } from './production-origin';
+import { createRewrite } from './production-origin';
+import { createRequest } from './request';
+import { checkUncrawledLinks } from './uncrawled-links';
 
 const BYPASS_ENV = 'VERCEL_AUTOMATION_BYPASS_SECRET';
 
@@ -13,16 +15,25 @@ const print = (title: string, results: LinkResult[], describe: (link: LinkResult
   }
 };
 
+const originOf = (url: string) => {
+  try {
+    return new URL(url).origin;
+  } catch {
+    return undefined;
+  }
+};
+
 /** Crawls `url` and prints the result. Returns the process exit code. */
 export async function run(url: string, config: CheckLinksConfig): Promise<number> {
   const { origin } = new URL(url);
   const rewrite = createRewrite(url, config.productionOrigin);
   const bypassSecret = process.env[BYPASS_ENV];
-  // Lets the crawler through Vercel's deployment protection
+  // Lets the crawler through Vercel's deployment protection. Only ever sent to the checked origin.
   const headers: Record<string, string> = bypassSecret
     ? { 'x-vercel-protection-bypass': bypassSecret }
     : {};
-  const headersFor = (requestUrl: string) => (new URL(requestUrl).origin === origin ? headers : {});
+  const headersFor = (requestUrl: string) => (originOf(requestUrl) === origin ? headers : {});
+  const request = createRequest(headersFor);
 
   // A protected deployment redirects to Vercel's login page, which linkinator would happily
   // check instead of the site
@@ -50,32 +61,21 @@ export async function run(url: string, config: CheckLinksConfig): Promise<number
     retryErrorsCount: 2,
     retry: true,
     headers,
-    // Links to a production origin are requested on the checked origin below instead
-    linksToSkip: async (link) => isSkipped(link) || rewrite(link) !== undefined,
+    // The crawler sends the headers with every request, so it only requests the checked origin.
+    // Links to other origins (and to a production origin, see the config) are requested below.
+    linksToSkip: async (link) => isSkipped(link) || originOf(link) !== origin,
   });
 
-  /** Requests `requestUrl` and tells the status; `undefined` if the request failed */
-  const request = async (requestUrl: string) => {
-    try {
-      const response = await fetch(requestUrl, { headers: headersFor(requestUrl) });
-      await response.body?.cancel();
-      return response.status;
-    } catch {
-      return undefined;
-    }
-  };
-
-  const pointsAtProduction = (link: LinkResult) => rewrite(link.url) !== undefined;
-  const rewritten = await checkRewrittenLinks(
-    crawled.filter((link) => link.state === LinkState.SKIPPED && !isSkipped(link.url)),
-    rewrite,
+  /** The links the crawl left out and that are requested here instead */
+  const isUncrawled = (link: LinkResult) =>
+    link.state === LinkState.SKIPPED && !isSkipped(link.url) && /^https?:\/\//i.test(link.url);
+  const uncrawled = await checkUncrawledLinks(
+    crawled.filter(isUncrawled),
+    (link) => rewrite(link) ?? link,
     request,
     concurrency,
   );
-  const links = [
-    ...crawled.filter((link) => link.state !== LinkState.SKIPPED || !pointsAtProduction(link)),
-    ...rewritten,
-  ];
+  const links = [...crawled.filter((link) => !isUncrawled(link)), ...uncrawled];
 
   const isWarningOnly = (link: LinkResult) =>
     config.isWarningOnly?.(link, { origin, url, requestUrl: rewrite(link.url) ?? link.url }) ??
