@@ -85,7 +85,9 @@ export default defineConfig({ url: 'http://localhost:3000', retryAfterMs: 1000 }
 
 ## GitHub workflow: check every Vercel deployment
 
-The package contains a workflow template that runs the check when Vercel reports a ready deployment, shows the result as a **"Broken Links" check run** on the deployed commit (so it appears on the pull request, with the full output) and reports the commit status that Vercel's Deployment Checks can require before a production deployment gets its domain.
+The package contains a workflow template that runs the check when Vercel reports a ready deployment, reports the result as a **"Broken Links" commit status** on the deployed commit (so it appears on the pull request and can be a required status check in branch rulesets) and reports the commit status that Vercel's Deployment Checks can require before a production deployment gets its domain. The status only has a one-line description; the full output is in the job summary of the workflow run the status links to.
+
+The result is a commit status rather than a check run on purpose: a check run created through the API joins an existing GitHub Actions check suite on the commit, and when that suite is superseded (GitHub sometimes delivers the `pull_request` event twice for one push, and a concurrency rule cancels the first run), the merge box never sees the check run and a required check stays "expected" forever. A status is attached to the commit itself. Don't name a job "Broken Links": a check run with the same name as a required status would have to pass as well.
 
 ```bash
 bunx check-links init-workflow          # writes .github/workflows/broken-links.yml
@@ -99,7 +101,7 @@ Setup:
 4. Adjust the "Check for broken links" step if the package isn't a dependency of the repository root (e.g. `bun --cwd=apps/web run …`), and optionally remove the "Report to Vercel" step.
 5. Run it once by hand: Actions → Broken Links → Run workflow, with a deployment URL.
 
-Without the secret, production deployments fail the job (they would be held back anyway) and previews are skipped with a warning.
+Without the secret, production deployments fail the job (they would be held back anyway) and previews are skipped with a warning; a skipped preview still reports a successful status, so a required status check doesn't hold the pull request back. Manual runs (`workflow_dispatch`) report no status, since GitHub never counts them for a pull request.
 
 ## Local development of the checks
 
