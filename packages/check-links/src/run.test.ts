@@ -167,6 +167,27 @@ describe('run with productionOrigin', () => {
     expect(requests.find(({ path }) => path === '/redirect')?.bypass).toBe('test-bypass');
   });
 
+  test("makes its own requests with undici's fetch, never the runtime's", async () => {
+    // The crawler registers undici's dispatcher globally; on Node 22 the built-in fetch then
+    // returns responses without headers, so redirects aren't followed. Using the built-in
+    // fetch anywhere would fail this run.
+    const builtIn = spyOn(globalThis, 'fetch').mockImplementation(
+      Object.assign(
+        () => {
+          throw new Error('the built-in fetch must not be used');
+        },
+        { preconnect: () => {} },
+      ),
+    );
+    try {
+      const exitCode = await run(url('/external'), { retryAfterMs: 0 });
+      expect(output.at(-1)).toContain('0 broken, 0 warnings');
+      expect(exitCode).toBe(0);
+    } finally {
+      builtIn.mockRestore();
+    }
+  });
+
   test('does nothing when the checked origin is the production origin', async () => {
     const exitCode = await run(url('/self-broken'), {
       productionOrigin: origin(),

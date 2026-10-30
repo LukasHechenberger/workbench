@@ -1,3 +1,8 @@
+// The crawler (linkinator) requests with undici's fetch, which registers its own dispatcher
+// globally; a runtime's built-in fetch that shares that registration (Node 22 bundles an older
+// undici) then gets responses without headers. So the package's own requests use undici too.
+import { fetch } from 'undici';
+
 const MAX_REDIRECTS = 10;
 
 const isRedirect = (status: number) => [301, 302, 303, 307, 308].includes(status);

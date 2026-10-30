@@ -44,3 +44,18 @@ jobs:
           publish: bun run release
         env:
           GITHUB_TOKEN: ${{ secrets.CHANGESETS_GITHUB_TOKEN }}
+
+  # The packages support Node.js 22.18+, whose built-in fetch (an older undici) differs from
+  # Node 24's; the integration tests run the compiled CLIs with the Node on the PATH
+  test-node-22:
+    name: Tests on Node 22
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: bun install --frozen-lockfile
+      - run: bun run test

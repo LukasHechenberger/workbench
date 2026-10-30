@@ -1,4 +1,5 @@
 import { check, type LinkResult, LinkState } from 'linkinator';
+import { fetch } from 'undici';
 import { classify } from './classify';
 import type { CheckLinksConfig } from './config';
 import { createRewrite } from './production-origin';
