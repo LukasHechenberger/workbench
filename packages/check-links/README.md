@@ -46,11 +46,13 @@ import { defineConfig } from '@lhechenberger/check-links';
 
 export default defineConfig({
   url: 'http://localhost:3000',
+  // Links to the live site are checked on the deployment under test (see below)
+  productionOrigin: 'https://www.example.com',
   // Never checked. Strings are regular expression sources.
   skip: [/^https:\/\/www\.instagram\.com\//, String.raw`^https://example\.org/`],
   // Broken links that must not fail the check, e.g. content you can't fix. Not re-requested.
-  isWarningOnly: (link, { origin, url }) =>
-    !link.url.startsWith(origin) && new URL(link.parent ?? url).pathname.startsWith('/docs/'),
+  isWarningOnly: (link, { origin, url, requestUrl }) =>
+    !requestUrl.startsWith(origin) && new URL(link.parent ?? url).pathname.startsWith('/docs/'),
   warningTitle: 'Broken links in embedded READMEs',
   retryAfterMs: 5000, // wait before the second request
   recheckConcurrency: 5, // parallel second requests
@@ -59,16 +61,28 @@ export default defineConfig({
 });
 ```
 
-| Option               | Default | Description                                          |
-| -------------------- | ------- | ---------------------------------------------------- |
-| `url`                | –       | Used when no URL is passed on the command line       |
-| `skip`               | `[]`    | Links not to check                                   |
-| `isWarningOnly`      | –       | `(link, { origin, url }) => boolean`                 |
-| `warningTitle`       | generic | Heading for the `isWarningOnly` links                |
-| `retryAfterMs`       | `5000`  | Wait before broken links are requested a second time |
-| `recheckConcurrency` | `5`     | Parallel second requests; keep low (see above)       |
-| `concurrency`        | `20`    | Parallel requests of the crawl                       |
-| `timeout`            | `30000` | Timeout per request in ms                            |
+| Option               | Default | Description                                                                 |
+| -------------------- | ------- | --------------------------------------------------------------------------- |
+| `url`                | –       | Used when no URL is passed on the command line                              |
+| `productionOrigin`   | –       | Origin(s) of the live site; links to them are checked on the checked origin |
+| `skip`               | `[]`    | Links not to check                                                          |
+| `isWarningOnly`      | –       | `(link, { origin, url, requestUrl }) => boolean`                            |
+| `warningTitle`       | generic | Heading for the `isWarningOnly` links                                       |
+| `retryAfterMs`       | `5000`  | Wait before broken links are requested a second time                        |
+| `recheckConcurrency` | `5`     | Parallel second requests; keep low (see above)                              |
+| `concurrency`        | `20`    | Parallel requests of the crawl                                              |
+| `timeout`            | `30000` | Timeout per request in ms                                                   |
+
+### Links to the live site (`productionOrigin`)
+
+Pages usually carry absolute links to the live site: `<link rel="canonical">`, `hreflang` alternates, `og:url`, JSON-LD. On a deployment that isn't live yet they point at the _previous_ build, so a new route is reported as broken although it works on the deployment, and a production deployment whose check must pass before it gets its domain can never be promoted. With `productionOrigin` set to the live site's origin, such links are requested on the origin being checked instead:
+
+- A link is rewritten only if its origin is exactly a configured origin (`https://www.example.com/x` for `https://www.example.com`, not `https://example.com/x` or `https://www.example.com.evil.test/x`). Only the origin of the configured value is used; several origins are accepted as an array (e.g. one per locale).
+- The option does nothing when the origin being checked is one of the configured origins, so the same config works for checking the live site.
+- The rewritten requests get the `x-vercel-protection-bypass` header like all other requests to the checked origin.
+- The links are requested, not crawled: a page that is linked only by its live URL isn't followed.
+- Broken links are reported as written on the page, with the URL that was requested: `[404] https://www.example.com/x (checked as https://my-app-abc123.vercel.app/x)`.
+- `skip` patterns and `isWarningOnly` see the link as written on the page; `isWarningOnly` gets the requested URL as `requestUrl` in its context (for a link that isn't rewritten it's the link itself).
 
 In a JavaScript config (`check-links.config.mjs`, or `.js` in a package with `"type": "module"`) use the same code without type annotations; `defineConfig` still gives editors the types:
 
@@ -107,7 +121,7 @@ Without the secret, production deployments fail the job (they would be held back
 
 `bun run test` (Turborepo, from the repository root) builds the package and runs
 
-- the unit tests of the classification (flaky vs. real errors) (`test`), in parallel to the build, and
+- the unit tests (`test`: the classification into flaky and real errors, the `productionOrigin` rewrite, and the whole check against a local server), in parallel to the build, and
 - once built, an integration test (`test:integration`, `integration/node.test.ts`) that runs the compiled CLI **with Node.js** against a local server: the usage output, the exit code for a broken link, a TypeScript `check-links.config.ts` loaded through Node's native type stripping, and a `check-links.config.mjs` found in the working directory. It needs `node` on the `PATH` (22.18 or newer, or any Node.js with `--experimental-strip-types`) and makes no network requests.
 
 To check by hand which Node.js versions work, run `bun run build` and then `node dist/cli.js <url>` with that version (e.g. `npx node@22.18 dist/cli.js <url>`).

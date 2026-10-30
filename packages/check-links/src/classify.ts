@@ -1,4 +1,5 @@
 import type { LinkResult } from 'linkinator';
+import { mapInBatches } from './batches';
 
 export interface Classification {
   /** Still broken on the second request */
@@ -36,11 +37,7 @@ export async function classify(
 
   await wait();
   // A burst of requests is what failed in the first place, so the second pass is gentle
-  for (let i = 0; i < toRecheck.length; i += concurrency) {
-    const batch = toRecheck.slice(i, i + concurrency);
-    // oxlint-disable-next-line no-await-in-loop -- one batch after the other, on purpose
-    const results = await Promise.all(batch.map((link) => recovers(link)));
-    for (const [index, link] of batch.entries()) (results[index] ? flaky : errors).push(link);
-  }
+  const results = await mapInBatches(toRecheck, concurrency, recovers);
+  for (const [index, link] of toRecheck.entries()) (results[index] ? flaky : errors).push(link);
   return { errors, flaky, warnings };
 }
