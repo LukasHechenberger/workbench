@@ -16,7 +16,7 @@ Payload's queue stays as it is: `schedulePublish`, the Jobs admin view, retries 
 
 ## Installation
 
-Needs Payload 3.60 or newer. Due jobs run after the response with Next.js' `after()` (Next.js 15.1 or newer) by default; elsewhere, pass `runAfterResponse`.
+Needs Payload 3.60 or newer (tested with 3.90). Due jobs run after the response with Next.js' `after()` (Next.js 15.1 or newer) by default; elsewhere, pass `runAfterResponse`.
 
 ```sh
 npm install @lhechenberger/payload-vercel-schedules
@@ -132,3 +132,7 @@ The handler queues the scheduled jobs and runs the due ones. Static schedules ar
 ## Local development
 
 `next dev` runs due jobs after the response, but doesn't create schedules. With the Vercel CLI's local Schedules API (`VERCEL_SCHEDULE_DEV_API_VERSION=1`), schedules are created there instead. To try a deployed setup, use a Preview deployment: its schedules are separate from production's.
+
+## License
+
+[MIT](LICENSE)
