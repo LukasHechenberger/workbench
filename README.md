@@ -2,9 +2,10 @@
 
 Personal helper packages for CI, testing and tooling, published under the `@lhechenberger` npm scope. A Bun workspaces monorepo; every package is documented in its own README, which is what the npm page shows.
 
-| Package                                              | Description                                                       |
-| ---------------------------------------------------- | ----------------------------------------------------------------- |
-| [`@lhechenberger/check-links`](packages/check-links) | Broken-link crawler for deployments that separates flaky failures |
+| Package                                                                        | Description                                                       |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| [`@lhechenberger/check-links`](packages/check-links)                           | Broken-link crawler for deployments that separates flaky failures |
+| [`@lhechenberger/payload-vercel-schedules`](packages/payload-vercel-schedules) | Runs Payload CMS jobs on time with Vercel Schedules and Queues    |
 
 ## Claude Code skills and agents
 

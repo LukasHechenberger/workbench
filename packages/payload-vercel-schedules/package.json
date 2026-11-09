@@ -1,0 +1,67 @@
+{
+  "name": "@lhechenberger/payload-vercel-schedules",
+  "version": "0.1.0",
+  "description": "Runs Payload CMS jobs on time with Vercel Schedules and Queues instead of a polling cron",
+  "keywords": [
+    "jobs",
+    "payload",
+    "payload-plugin",
+    "queues",
+    "schedules",
+    "vercel"
+  ],
+  "homepage": "https://github.com/LukasHechenberger/workbench/tree/main/packages/payload-vercel-schedules#readme",
+  "bugs": {
+    "url": "https://github.com/LukasHechenberger/workbench/issues"
+  },
+  "license": "MIT",
+  "author": "Lukas Hechenberger",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LukasHechenberger/workbench.git",
+    "directory": "packages/payload-vercel-schedules"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./handlers": {
+      "types": "./dist/handlers.d.ts",
+      "default": "./dist/handlers.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "bun run ../../scripts/build.ts",
+    "prepack": "bun run build",
+    "test": "bun test src"
+  },
+  "dependencies": {
+    "@vercel/queue": "^0.11.0",
+    "@vercel/schedules": "0.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "next": "16.3.6",
+    "payload": "3.90.2"
+  },
+  "peerDependencies": {
+    "next": ">=15.1.0",
+    "payload": "^3.60.0"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=20.9"
+  }
+}
