@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "npm-first-release": {
+      "source": "./skills/npm-first-release",
+      "sourceType": "local",
+      "computedHash": "e762ea5bf89d38c9a11c609c5df10a05e913435fa8ca750bec025a71d3643a0b"
+    },
     "pre-pr": {
       "source": "./skills/pre-pr",
       "sourceType": "local",
