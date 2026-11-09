@@ -1,6 +1,6 @@
 {
   "name": "@lhechenberger/payload-vercel-schedules",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Runs Payload CMS jobs on time with Vercel Schedules and Queues instead of a polling cron",
   "keywords": [
     "jobs",

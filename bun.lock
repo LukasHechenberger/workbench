@@ -28,7 +28,7 @@
     },
     "packages/payload-vercel-schedules": {
       "name": "@lhechenberger/payload-vercel-schedules",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@vercel/queue": "^0.11.0",
         "@vercel/schedules": "0.0.3",
