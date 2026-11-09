@@ -14,9 +14,10 @@ Agents are plain files: copy `agents/<name>.md` to the project's `.claude/agents
 
 ## Contents
 
-| Name                 | Kind  | What it does                                                          | Reads from `AGENTS.md`                          |
-| -------------------- | ----- | --------------------------------------------------------------------- | ----------------------------------------------- |
-| `add-migration`      | skill | Creates a Payload (Postgres) migration with the usual manual fixes    | script names, changeset rules                   |
-| `switch-preview-mcp` | skill | Points a preview MCP server at another Vercel preview deployment      | variable names, endpoint path, allowed hosts    |
-| `pre-pr`             | skill | Runs the project's checks and reviewer agents before opening a PR     | "Checks", reviewer agents, "Changesets"         |
-| `public-repo-guard`  | agent | Reviews changes for secrets and project details before they go public | "Public repository" section, optional deny-list |
+| Name                 | Kind  | What it does                                                           | Reads from `AGENTS.md`                          |
+| -------------------- | ----- | ---------------------------------------------------------------------- | ----------------------------------------------- |
+| `add-migration`      | skill | Creates a Payload (Postgres) migration with the usual manual fixes     | script names, changeset rules                   |
+| `switch-preview-mcp` | skill | Points a preview MCP server at another Vercel preview deployment       | variable names, endpoint path, allowed hosts    |
+| `pre-pr`             | skill | Runs the project's checks and reviewer agents before opening a PR      | "Checks", reviewer agents, "Changesets"         |
+| `npm-first-release`  | skill | First npm release of a package, then trusted publishing without tokens | publishing workflow, release script             |
+| `public-repo-guard`  | agent | Reviews changes for secrets and project details before they go public  | "Public repository" section, optional deny-list |
