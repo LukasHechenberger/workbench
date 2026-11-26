@@ -76,6 +76,20 @@ redirectEmails(adapter, {
 - cc and bcc are dropped (they're named in the subject), `replyTo` is kept.
 - An email that already goes only to the redirect address (e.g. the app's own notifications) keeps its subject.
 
+## Options
+
+`redirectNonProductionEmails(adapter, options?)`:
+
+| Option        | Default                           | Description                                                                             |
+| ------------- | --------------------------------- | --------------------------------------------------------------------------------------- |
+| `to`          | `NOTIFICATIONS_EMAIL`             | Where every email goes outside production                                               |
+| `label`       | the environment's name or `Local` | The subject's prefix                                                                    |
+| `subject`     | `[label → recipients] subject`    | A function `(subject, { recipients, label }) => string` for the redirected subject      |
+| `whenUnset`   | `'block'`                         | Without an address: `'block'` sends nothing and logs a warning, `'send'` sends as usual |
+| `environment` | `process.env`                     | The environment variables to read, e.g. in tests                                        |
+
+`redirectEmails(adapter, { to, label?, subject? })` takes `to` (without it, the adapter is returned unchanged), `label` (default `Redirected`) and `subject`.
+
 ## License
 
 [MIT](LICENSE)

@@ -28,7 +28,7 @@
     },
     "packages/payload-email-redirect": {
       "name": "@lhechenberger/payload-email-redirect",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "devDependencies": {
         "payload": "3.90.2",
       },
