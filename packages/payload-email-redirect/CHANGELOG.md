@@ -1,5 +1,11 @@
 # @lhechenberger/payload-email-redirect
 
+## 0.1.1
+
+### Patch Changes
+
+- README: list the options of `redirectNonProductionEmails` and `redirectEmails`.
+
 ## 0.1.0
 
 ### Minor Changes
