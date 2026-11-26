@@ -43,6 +43,23 @@ export default buildConfig({
 - **Label:** the environment, e.g. `Preview`, a custom environment's name (`VERCEL_TARGET_ENV`, e.g. `Staging`), or `Local`; or the `label` option.
 - **Without an address** outside production, nothing is sent and a warning is logged, so a forgotten variable can't reach real recipients. `whenUnset: 'send'` sends as usual instead.
 
+### With Turborepo
+
+Deployed functions read the variables at runtime, so Turborepo doesn't affect them. Tasks that Turborepo runs (`build`, and scripts that start Payload, such as seeding or migrations) only see environment variables listed in `turbo.json` (strict mode, the default). Without them, such a task counts as not production: on a production build it would redirect or block emails that are sent during the build. Vercel also warns about `NOTIFICATIONS_EMAIL` as a missing variable. List them for every task that runs Payload:
+
+```json
+// turbo.json
+{
+  "tasks": {
+    "build": {
+      "env": ["NOTIFICATIONS_EMAIL", "VERCEL_ENV", "VERCEL_TARGET_ENV"]
+    }
+  }
+}
+```
+
+Use `env` rather than `passThroughEnv`: with `env`, the values are part of the cache key, so a cached preview build is never reused for production.
+
 ## Anywhere else
 
 ```ts
