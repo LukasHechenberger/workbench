@@ -44,9 +44,6 @@ jobs:
           publish: bun run release
         env:
           GITHUB_TOKEN: ${{ secrets.CHANGESETS_GITHUB_TOKEN }}
-          # Temporary: the first publish of a new package can't use trusted publishing (it can only
-          # be configured for existing packages). Remove with the NPM_TOKEN secret afterwards.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   # The packages support Node.js 22.18+, whose built-in fetch (an older undici) differs from
   # Node 24's; the integration tests run the compiled CLIs with the Node on the PATH
