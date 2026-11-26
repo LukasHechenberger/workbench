@@ -1,0 +1,50 @@
+{
+  "name": "@lhechenberger/payload-email-redirect",
+  "version": "0.1.0",
+  "description": "Sends a Payload app's emails to one address outside production, so previews never reach real recipients",
+  "keywords": [
+    "email",
+    "payload",
+    "preview",
+    "staging",
+    "vercel"
+  ],
+  "homepage": "https://github.com/LukasHechenberger/workbench/tree/main/packages/payload-email-redirect#readme",
+  "bugs": {
+    "url": "https://github.com/LukasHechenberger/workbench/issues"
+  },
+  "license": "MIT",
+  "author": "Lukas Hechenberger",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LukasHechenberger/workbench.git",
+    "directory": "packages/payload-email-redirect"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "bun run ../../scripts/build.ts",
+    "prepack": "bun run build",
+    "test": "bun test src"
+  },
+  "devDependencies": {
+    "payload": "3.90.2"
+  },
+  "peerDependencies": {
+    "payload": "^3.90.2"
+  },
+  "engines": {
+    "node": ">=20.9"
+  }
+}

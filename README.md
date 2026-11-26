@@ -5,6 +5,7 @@ Personal helper packages for CI, testing and tooling, published under the `@lhec
 | Package                                                                        | Description                                                       |
 | ------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
 | [`@lhechenberger/check-links`](packages/check-links)                           | Broken-link crawler for deployments that separates flaky failures |
+| [`@lhechenberger/payload-email-redirect`](packages/payload-email-redirect)     | Sends a Payload app's emails to one address outside production    |
 | [`@lhechenberger/payload-vercel-schedules`](packages/payload-vercel-schedules) | Runs Payload CMS jobs on time with Vercel Schedules and Queues    |
 
 ## Claude Code skills and agents
